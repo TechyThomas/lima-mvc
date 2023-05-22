@@ -1,0 +1,19 @@
+{
+    "name": "spacecow/lima-mvc",
+    "description": "A simple, expandable MVC framework",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Spacecow\\LimaMvc\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Thomas Carter",
+            "email": "thomas@spacecow.xyz"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    }
+}
