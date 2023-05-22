@@ -4,7 +4,7 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Spacecow\\LimaMvc\\": "src/"
+            "Lima\\": "src/Lima"
         }
     },
     "authors": [
