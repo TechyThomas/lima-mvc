@@ -9,7 +9,9 @@ class QueryBuilder {
         'select' => '',
         'update' => '',
         'insert' => '',
-        'delete' => false
+        'delete' => false,
+        'limit' => -1,
+        'order' => ''
     ];
 
     private $lastInsertID;
@@ -23,9 +25,15 @@ class QueryBuilder {
         return $this;
     }
 
-    public function select($columns): self {
-        $columns = is_array($columns) ? $columns : [$columns];
-        $this->sqlParts['select'] = join(', ', $columns);
+    public function select($columns = []): self {
+        if (!empty($columns)) {
+            $columns = is_array($columns) ? $columns : [$columns];
+            $this->sqlParts['select'] = join(', ', $columns);
+        }
+        else {
+            $this->sqlParts['select'] = '*';
+        }
+
         return $this;
     }
 
@@ -52,5 +60,15 @@ class QueryBuilder {
     public function wheres($data): self {
         $this->sqlParts['where'] = $data;
         return $this;
+    }
+
+    public function get(): array {
+        $queryComposer = new QueryComposer($this->sqlParts);
+        $sql = $queryComposer->compose();
+
+        $db = $this->database->getPDO()->prepare($sql);
+        $db->execute();
+
+        return $db->fetchAll();
     }
 }

@@ -24,4 +24,8 @@ class Database {
 
         return self::$instance;
     }
+
+    public function getPDO(): \PDO {
+        return $this->database;
+    }
 }
