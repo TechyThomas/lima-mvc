@@ -6,7 +6,7 @@ class QueryBuilder {
     private $database;
     private $sqlParts = [
         'table' => '',
-        'select' => '',
+        'select' => '*',
         'update' => '',
         'insert' => '',
         'delete' => false,
@@ -72,12 +72,30 @@ class QueryBuilder {
         return $this;
     }
 
-    public function get(): array {
+    public function get() {
+        $results = $this->getAll();
+
+        if (!empty($results) && count($results) == 1) {
+            return $results[0];
+        }
+
+        return $results;
+    }
+
+    public function getSingle() {
+        $results = $this->getAll();
+        if (empty($results)) return $results;
+
+        return $results[0];
+    }
+
+    public function getAll(): array {
         $queryComposer = new QueryComposer($this->sqlParts);
         $sql = $queryComposer->compose();
 
         $db = $this->database->getPDO()->prepare($sql);
-        $db->execute();
+        $values = $queryComposer->getValues();;
+        $db->execute($values);
 
         return $db->fetchAll();
     }

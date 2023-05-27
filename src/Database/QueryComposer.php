@@ -4,6 +4,7 @@ namespace Lima\Database;
 
 class QueryComposer {
     private $sqlParts;
+    private $values = [];
 
     public function __construct($sqlParts) {
         $this->sqlParts = $sqlParts;
@@ -18,6 +19,10 @@ class QueryComposer {
 
         if (!empty($this->sqlParts['delete'])) {
             $sql = "DELETE FROM {$this->sqlParts['table']}";
+        }
+
+        if (!empty($this->sqlParts['where'])) {
+            $sql .= ' WHERE ' . $this->composeWhere();
         }
 
         if (!empty($this->sqlParts['order'])) {
@@ -36,6 +41,27 @@ class QueryComposer {
             $sql .= ' LIMIT ' . $this->sqlParts['limit'];
         }
 
+        // echo $sql. '<br/>';
+
         return $sql;
+    }
+
+    public function composeWhere(): string {
+        if (empty($this->sqlParts['where'])) {
+            return '';
+        }
+
+        $sqlWhere = [];
+
+        foreach ($this->sqlParts['where'] as $column => $value) {
+            $sqlWhere[] = $column . ' = ?';
+            $this->values[] = $value;
+        }
+
+        return join(' AND ', $sqlWhere);
+    }
+
+    public function getValues(): array {
+        return $this->values;
     }
 }
