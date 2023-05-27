@@ -78,7 +78,7 @@ class QueryBuilder {
         return $this;
     }
 
-    public function get() {
+    public function get(): array {
         $results = $this->getAll();
 
         if (!empty($results) && count($results) == 1) {
