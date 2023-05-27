@@ -17,7 +17,7 @@ class QueryBuilder {
     private $lastInsertID;
 
     public function __construct() {
-        $this->database = Database::getInstance('', '', '', '');
+        $this->database = Database::getInstance($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
     }
 
     public function table($table): self {
@@ -59,6 +59,11 @@ class QueryBuilder {
 
     public function wheres($data): self {
         $this->sqlParts['where'] = $data;
+        return $this;
+    }
+
+    public function limit($limit): self {
+        $this->sqlParts['limit'] = (int) $limit;
         return $this;
     }
 
