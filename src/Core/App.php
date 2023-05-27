@@ -27,6 +27,10 @@ class App {
 
         $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS']);
 
+        foreach ($_ENV as $name => $value) {
+            define($name, $value);
+        }
+
         if (!empty($_ENV['LIMA_CONTROLLER_PATH'])) {
             $this->controllerPath = $_ENV['LIMA_CONTROLLER_PATH'];
         }
