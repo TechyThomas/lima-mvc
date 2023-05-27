@@ -67,6 +67,11 @@ class QueryBuilder {
         return $this;
     }
 
+    public function order($order, $direction = 'DESC'): self {
+        $this->sqlParts['order'] = [$order, $direction];
+        return $this;
+    }
+
     public function get(): array {
         $queryComposer = new QueryComposer($this->sqlParts);
         $sql = $queryComposer->compose();
