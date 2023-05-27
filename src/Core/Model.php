@@ -6,6 +6,7 @@ use Lima\Database\QueryBuilder;
 class Model extends QueryBuilder {
     protected $table = '';
     protected $primaryKey = '';
+    protected $fields = [];
 
     public function __construct() {
         parent::__construct();

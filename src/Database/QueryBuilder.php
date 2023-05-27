@@ -14,10 +14,16 @@ class QueryBuilder {
         'order' => ''
     ];
 
+    protected $fields = [];
+
     private $lastInsertID;
 
     public function __construct() {
         $this->database = Database::getInstance($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
+
+        if (!empty($this->fields)) {
+            $this->select($this->fields);
+        }
     }
 
     public function table($table): self {
@@ -97,6 +103,6 @@ class QueryBuilder {
         $values = $queryComposer->getValues();;
         $db->execute($values);
 
-        return $db->fetchAll();
+        return $db->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
