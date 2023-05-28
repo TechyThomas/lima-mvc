@@ -4,6 +4,9 @@ namespace Lima\Database;
 
 class QueryBuilder {
     private $database;
+    private $pdo;
+    private $values;
+
     private $sqlParts = [
         'table' => '',
         'select' => '*',
@@ -43,9 +46,11 @@ class QueryBuilder {
         return $this;
     }
 
-    public function update($data): self {
+    public function update($data): bool {
         $this->sqlParts['update'] = $data;
-        return $this;
+        $this->prepareQuery();
+
+        return $this->pdo->execute($this->values);
     }
 
     public function insert($data): self {
@@ -53,9 +58,11 @@ class QueryBuilder {
         return $this;
     }
 
-    public function delete(): self {
+    public function delete(): bool {
         $this->sqlParts['delete'] = true;
-        return $this;
+        $this->prepareQuery();
+
+        return $this->pdo->execute($this->values);
     }
 
     public function where($column, $value): self {
@@ -78,6 +85,17 @@ class QueryBuilder {
         return $this;
     }
 
+    private function prepareQuery(): \PDOStatement {
+        $queryComposer = new QueryComposer($this->sqlParts);
+        $sql = $queryComposer->compose();
+
+        $db = $this->database->getPDO()->prepare($sql);
+        $this->values = $queryComposer->getValues();
+        $this->pdo = $db;
+
+        return $db;
+    }
+
     public function get(): array {
         $results = $this->getAll();
 
@@ -96,12 +114,8 @@ class QueryBuilder {
     }
 
     public function getAll(): array {
-        $queryComposer = new QueryComposer($this->sqlParts);
-        $sql = $queryComposer->compose();
-
-        $db = $this->database->getPDO()->prepare($sql);
-        $values = $queryComposer->getValues();;
-        $db->execute($values);
+        $db = $this->prepareQuery();
+        $db->execute($this->values);
 
         return $db->fetchAll(\PDO::FETCH_ASSOC);
     }

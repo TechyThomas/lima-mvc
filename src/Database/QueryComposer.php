@@ -17,6 +17,17 @@ class QueryComposer {
             $sql = "SELECT {$this->sqlParts['select']} FROM {$this->sqlParts['table']}";
         }
 
+        if (!empty($this->sqlParts['update'])) {
+            $updateSet = [];
+
+            foreach ($this->sqlParts['update'] as $column => $value) {
+                $updateSet[] = "`{$column}` = ?";
+                $this->values[] = $value;
+            }
+
+            $sql = "UPDATE {$this->sqlParts['table']} SET " . join(', ', $updateSet);
+        }
+
         if (!empty($this->sqlParts['delete'])) {
             $sql = "DELETE FROM {$this->sqlParts['table']}";
         }
