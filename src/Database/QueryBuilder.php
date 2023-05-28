@@ -27,6 +27,10 @@ class QueryBuilder {
         if (!empty($this->fields)) {
             $this->select($this->fields);
         }
+
+        if (!empty($_ENV['DB_DEFAULT_LIMIT']) && (int) $_ENV['DB_DEFAULT_LIMIT'] > 0) {
+            $this->limit((int) $_ENV['DB_DEFAULT_LIMIT']);
+        }
     }
 
     public function table($table): self {

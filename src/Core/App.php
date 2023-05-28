@@ -27,6 +27,8 @@ class App {
 
         $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS']);
 
+        $dotenv->ifPresent('DB_DEFAULT_LIMIT')->isInteger();
+
         foreach ($_ENV as $name => $value) {
             define($name, $value);
         }
