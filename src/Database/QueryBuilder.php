@@ -2,7 +2,8 @@
 
 namespace Lima\Database;
 
-class QueryBuilder {
+class QueryBuilder
+{
     private $database;
     private $pdo;
     private $values;
@@ -21,7 +22,8 @@ class QueryBuilder {
 
     private $lastInsertID;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->database = Database::getInstance($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
 
         if (!empty($this->fields)) {
@@ -33,63 +35,74 @@ class QueryBuilder {
         }
     }
 
-    public function table($table): self {
+    public function table($table): self
+    {
         $this->sqlParts['table'] = $table;
         return $this;
     }
 
-    public function select($columns = []): self {
+    public function select($columns = []): self
+    {
         if (!empty($columns)) {
             $columns = is_array($columns) ? $columns : [$columns];
             $this->sqlParts['select'] = join(', ', $columns);
-        }
-        else {
+        } else {
             $this->sqlParts['select'] = '*';
         }
 
         return $this;
     }
 
-    public function update($data): bool {
+    public function update($data): bool
+    {
         $this->sqlParts['update'] = $data;
         $this->prepareQuery();
 
         return $this->pdo->execute($this->values);
     }
 
-    public function insert($data): self {
+    public function insert($data): self
+    {
         $this->sqlParts['insert'] = $data;
-        return $this;
+        $this->prepareQuery();
+
+        return $this->pdo->execute($this->values);
     }
 
-    public function delete(): bool {
+    public function delete(): bool
+    {
         $this->sqlParts['delete'] = true;
         $this->prepareQuery();
 
         return $this->pdo->execute($this->values);
     }
 
-    public function where($column, $value): self {
+    public function where($column, $value): self
+    {
         $this->sqlParts['where'] = [$column => $value];
         return $this;
     }
 
-    public function wheres($data): self {
+    public function wheres($data): self
+    {
         $this->sqlParts['where'] = $data;
         return $this;
     }
 
-    public function limit($limit): self {
+    public function limit($limit): self
+    {
         $this->sqlParts['limit'] = (int) $limit;
         return $this;
     }
 
-    public function order($order, $direction = 'DESC'): self {
+    public function order($order, $direction = 'DESC'): self
+    {
         $this->sqlParts['order'] = [$order, $direction];
         return $this;
     }
 
-    private function prepareQuery(): \PDOStatement {
+    private function prepareQuery(): \PDOStatement
+    {
         $queryComposer = new QueryComposer($this->sqlParts);
         $sql = $queryComposer->compose();
 
@@ -100,7 +113,8 @@ class QueryBuilder {
         return $db;
     }
 
-    public function get(): array {
+    public function get(): array
+    {
         $results = $this->getAll();
 
         if (!empty($results) && count($results) == 1) {
@@ -110,14 +124,17 @@ class QueryBuilder {
         return $results;
     }
 
-    public function getSingle() {
+    public function getSingle()
+    {
         $results = $this->getAll();
-        if (empty($results)) return $results;
+        if (empty($results))
+            return $results;
 
         return $results[0];
     }
 
-    public function getAll(): array {
+    public function getAll(): array
+    {
         $db = $this->prepareQuery();
         $db->execute($this->values);
 
