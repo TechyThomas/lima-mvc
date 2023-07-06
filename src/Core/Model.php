@@ -1,14 +1,18 @@
 <?php
 
 namespace Lima\Core;
+
 use Lima\Database\QueryBuilder;
 
-class Model extends QueryBuilder {
+class Model extends QueryBuilder
+{
     protected $table = '';
     protected $primaryKey = '';
     protected $fields = [];
+    protected $timestamps = ['created', 'updated'];
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         if (empty($this->table)) {
@@ -22,7 +26,8 @@ class Model extends QueryBuilder {
         }
     }
 
-    public function getByID($id): ?array {
+    public function getByID($id): ?array
+    {
         $query = $this->where($this->primaryKey, $id)->getAll();
         // var_dump($query);
 
@@ -31,5 +36,29 @@ class Model extends QueryBuilder {
         }
 
         return $query[0];
+    }
+
+    public function create($data): bool|array
+    {
+        if (!empty($this->timestamps) && in_array('created', $this->timestamps)) {
+            $dt = new \DateTime();
+            $data['date_created'] = $dt->format('Y-m-d H:i:s');
+        }
+
+        $insertRow = $this->insert($data);
+        if (!$insertRow)
+            return false;
+
+        return $this->getByID($insertRow);
+    }
+
+    public function update($data): bool
+    {
+        if (!empty($this->timestamps) && in_array('updated', $this->timestamps)) {
+            $dt = new \DateTime();
+            $data['date_updated'] = $dt->format('Y-m-d H:i:s');
+        }
+
+        return $this->update($data);
     }
 }
