@@ -29,7 +29,6 @@ class Model extends QueryBuilder
     public function getByID($id): ?array
     {
         $query = $this->where($this->primaryKey, $id)->getAll();
-        // var_dump($query);
 
         if (empty($query) || count($query) > 1) {
             return null;
@@ -43,6 +42,15 @@ class Model extends QueryBuilder
         if (!empty($this->timestamps) && in_array('created', $this->timestamps)) {
             $dt = new \DateTime();
             $data['date_created'] = $dt->format('Y-m-d H:i:s');
+        }
+
+        if (!empty($this->fields)) {
+            foreach ($this->fields as $field) {
+                if (empty($data[$field]))
+                    continue;
+
+                unset($data[$field]);
+            }
         }
 
         $insertRow = $this->insert($data);
@@ -59,6 +67,15 @@ class Model extends QueryBuilder
             $data['date_updated'] = $dt->format('Y-m-d H:i:s');
         }
 
-        return $this->update($data);
+        if (!empty($this->fields)) {
+            foreach ($this->fields as $field) {
+                if (empty($data[$field]))
+                    continue;
+
+                unset($data[$field]);
+            }
+        }
+
+        return parent::update($data);
     }
 }
