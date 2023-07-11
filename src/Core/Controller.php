@@ -2,6 +2,11 @@
 
 namespace Lima\Core;
 
-class Controller {
-
+class Controller
+{
+    public function view($template, $data): bool
+    {
+        $view = new View();
+        return $view->render($template, $data);
+    }
 }
