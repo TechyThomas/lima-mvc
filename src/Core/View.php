@@ -6,7 +6,7 @@ class View
 {
     public function render($template, $data): bool
     {
-        $templateDir = LIMA_ROOT . 'views';
+        $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . 'views';
 
         if (!empty($_ENV['LIMA_TEMPLATE_DIR'])) {
             $templateDir = $_ENV['LIMA_TEMPLATE_DIR'];
@@ -16,7 +16,7 @@ class View
             $loader = new \Twig\Loader\FilesystemLoader($templateDir);
             $twig = new \Twig\Environment($loader);
 
-            echo $twig->render($template, $data);
+            echo $twig->render($template . '.php', $data);
 
             return true;
         }

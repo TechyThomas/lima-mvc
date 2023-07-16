@@ -4,20 +4,24 @@ namespace Lima\Core;
 
 require(__DIR__ . '/../../vendor/autoload.php');
 
-class App {
+class App
+{
     private $rootPath;
     private $appPath = 'app';
     private $controllerPath = 'Controllers';
     private $modelPath = 'Models';
 
-    public function __construct($rootPath) {
+    public function __construct($rootPath)
+    {
         $this->rootPath = $rootPath;
     }
 
-    public function init() {
+    public function init()
+    {
         $this->loadEnv();
         $this->loadDefines();
         $this->loadClasses();
+        $this->loadRoutes();
     }
 
     public function loadEnv()
@@ -45,13 +49,19 @@ class App {
     public function loadDefines()
     {
         define('LIMA_ROOT', $this->rootPath);
+
+        $controllerPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->controllerPath;
+        $modelPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->modelPath;
+
+        define('CONTROLLER_PATH', $controllerPath);
+        define('MODEL_PATH', $modelPath);
     }
 
     public function loadClasses()
     {
         spl_autoload_register(function ($class) {
-            $controllerPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->controllerPath;
-            $modelPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->modelPath;
+            $controllerPath = CONTROLLER_PATH;
+            $modelPath = MODEL_PATH;
 
             if (file_exists($controllerPath . DIRECTORY_SEPARATOR . $class . '.php')) {
                 require_once($controllerPath . DIRECTORY_SEPARATOR . $class . '.php');
@@ -61,5 +71,14 @@ class App {
                 require_once($modelPath . DIRECTORY_SEPARATOR . $class . '.php');
             }
         });
+    }
+
+    public function loadRoutes()
+    {
+        if (empty($_GET['url']))
+            return;
+
+        $router = new \Lima\Routing\Router();
+        $router->processRequest($_GET['url']);
     }
 }
