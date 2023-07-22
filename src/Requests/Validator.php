@@ -13,23 +13,22 @@ class Validator
         $this->input = $input;
     }
 
-    protected function getInput(): array
+    public function getInput(): array
     {
         $validatedInput = [];
 
         foreach ($this->rules as $inputName => $rule) {
             $ruleData = explode('|', $rule);
             $inputType = $ruleData[0];
+            $ruleProps = $ruleData[1] ?? '';
 
-            if ($this->validateType($inputName, $this->input[$inputName], $inputType, $ruleData[1])) {
-                $validatedInput[$inputName] = $this->input[$inputName];
-            }
+            $this->validateType($inputName, $this->input[$inputName], $inputType, $ruleProps);
         }
 
         return $validatedInput;
     }
 
-    protected function getErrors(): array
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -41,6 +40,10 @@ class Validator
 
     private function getProps($rule)
     {
+        if (empty($rule)) {
+            return [];
+        }
+
         $ruleProps = explode(',', $rule);
         $props = [];
 
@@ -63,7 +66,16 @@ class Validator
 
         switch ($type) {
             case 'text':
+            case 'string':
                 return $this->validateText($name, $input, $ruleProps);
+            case 'int':
+                return $this->validateInt($name, $input, $ruleProps);
+            case 'float':
+                return $this->validateFloat($name, $input, $ruleProps);
+            case 'array':
+                return $this->validateArray($name, $input, $ruleProps);
+            case 'email':
+                return $this->validateEmail($name, $input, $ruleProps);
         }
 
         return false;
@@ -71,6 +83,10 @@ class Validator
 
     private function validateText($name, $input, $props): bool
     {
+        if (gettype($input) != 'string') {
+            return false;
+        }
+
         if (!empty($props['min'])) {
             if (strlen($input) < (int) $props['min']) {
                 $this->addError($name, 'must be longer than ' . $props['min'] . ' characters');
@@ -84,6 +100,8 @@ class Validator
                 return false;
             }
         }
+
+        $this->input[$name] = filter_var($input, FILTER_SANITIZE_STRING);
 
         return true;
     }
@@ -110,6 +128,8 @@ class Validator
             }
         }
 
+        $this->input[$name] = filter_var($input, FILTER_VALIDATE_INT);
+
         return true;
     }
 
@@ -135,6 +155,8 @@ class Validator
             }
         }
 
+        $this->input[$name] = filter_var($input, FILTER_VALIDATE_FLOAT);
+
         return true;
     }
 
@@ -157,6 +179,24 @@ class Validator
                 return false;
             }
         }
+
+        $this->input[$name] = filter_var($input, FILTER_FORCE_ARRAY);
+
+        return true;
+    }
+
+    private function validateEmail($name, $input, $props): bool
+    {
+        if (gettype($input) != 'string') {
+            return false;
+        }
+
+        if (!filter_var($input, FILTER_VALIDATE_EMAIL)) {
+            $this->addError($name, 'is not a valid email address');
+            return false;
+        }
+
+        $this->input[$name] = filter_var($input, FILTER_SANITIZE_EMAIL);
 
         return true;
     }
