@@ -22,7 +22,18 @@ class Router
             $controller = ucfirst($urlData[0]);
             $method = $urlData[1] ?? 'index';
 
-            $controllerClass = new $controller();
+            $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
+
+            $contents = file_get_contents($controllerFile);
+            preg_match('/[\r\n]namespace\W(.+);[\r\n]/', $contents, $matches);
+            $namespace = $matches[1];
+
+            if (!empty($namespace)) {
+                $controllerClassFull = $namespace . '\\' . $controller;
+                $controllerClass = new $controllerClassFull();
+            } else {
+                $controllerClass = new $controller();
+            }
 
             if (!method_exists($controllerClass, $method)) {
                 die('Method: ' . $method . ' does not exist in controller ' . $controller);
