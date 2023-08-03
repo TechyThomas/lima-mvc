@@ -49,12 +49,10 @@ class Validator
 
         foreach ($ruleProps as $prop) {
             $propData = explode(':', $prop);
+            if (empty($propData) || count($propData) <= 1)
+                continue;
 
-            if (count($propData) == 1) {
-                $props[$propData] = true;
-            } else {
-                $props[$propData[0]] = $propData[1];
-            }
+            $props[$propData[0]] = $propData[1];
         }
 
         return $props;
