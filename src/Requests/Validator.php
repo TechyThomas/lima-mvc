@@ -6,6 +6,7 @@ class Validator
 {
     protected $rules = [];
     protected $input = [];
+    protected $validatedInput = [];
     protected $errors = [];
 
     public function __construct($input)
@@ -15,8 +16,6 @@ class Validator
 
     public function getInput(): array
     {
-        $validatedInput = [];
-
         foreach ($this->rules as $inputName => $rule) {
             $ruleData = explode('|', $rule);
             $inputType = $ruleData[0];
@@ -25,7 +24,7 @@ class Validator
             $this->validateType($inputName, $this->input[$inputName], $inputType, $ruleProps);
         }
 
-        return $validatedInput;
+        return $this->validatedInput;
     }
 
     public function getErrors(): array
@@ -99,7 +98,7 @@ class Validator
             }
         }
 
-        $this->input[$name] = filter_var($input, FILTER_SANITIZE_STRING);
+        $this->validatedInput[$name] = htmlspecialchars($input);
 
         return true;
     }
@@ -107,6 +106,7 @@ class Validator
     private function validateInt($name, $input, $props): bool
     {
         if (!is_numeric($input)) {
+            $this->addError($name, 'is not a number');
             return false;
         }
 
@@ -126,7 +126,7 @@ class Validator
             }
         }
 
-        $this->input[$name] = filter_var($input, FILTER_VALIDATE_INT);
+        $this->validatedInput[$name] = filter_var($input, FILTER_VALIDATE_INT);
 
         return true;
     }
@@ -134,6 +134,7 @@ class Validator
     private function validateFloat($name, $input, $props): bool
     {
         if (!is_float($input)) {
+            $this->addError($name, 'is not a number');
             return false;
         }
 
@@ -153,7 +154,7 @@ class Validator
             }
         }
 
-        $this->input[$name] = filter_var($input, FILTER_VALIDATE_FLOAT);
+        $this->validatedInput[$name] = filter_var($input, FILTER_VALIDATE_FLOAT);
 
         return true;
     }
@@ -161,6 +162,7 @@ class Validator
     private function validateArray($name, $input, $props): bool
     {
         if (!is_array($input)) {
+            $this->addError($name, 'is not an array');
             return false;
         }
 
@@ -178,7 +180,7 @@ class Validator
             }
         }
 
-        $this->input[$name] = filter_var($input, FILTER_FORCE_ARRAY);
+        $this->validatedInput[$name] = filter_var($input, FILTER_FORCE_ARRAY);
 
         return true;
     }
@@ -186,6 +188,7 @@ class Validator
     private function validateEmail($name, $input, $props): bool
     {
         if (gettype($input) != 'string') {
+            $this->addError($name, 'is not a string');
             return false;
         }
 
@@ -194,7 +197,7 @@ class Validator
             return false;
         }
 
-        $this->input[$name] = filter_var($input, FILTER_SANITIZE_EMAIL);
+        $this->validatedInput[$name] = filter_var($input, FILTER_SANITIZE_EMAIL);
 
         return true;
     }
