@@ -22,6 +22,16 @@ class Validator
             $ruleProps = $ruleData[1] ?? '';
 
             $this->validateType($inputName, $this->input[$inputName], $inputType, $ruleProps);
+
+            $propsArray = $this->getProps($ruleProps);
+
+            if (!empty($propsArray['match'])) {
+                $compareInput = $propsArray['match'];
+
+                if ($this->input[$inputName] !== $this->input[$compareInput]) {
+                    $this->addError($inputName, ' doesn\'t match ' . $compareInput);
+                }
+            }
         }
 
         return $this->validatedInput;
