@@ -61,6 +61,11 @@ class Validator
     {
         $ruleProps = $this->getProps($rule);
 
+        if (!empty($ruleProps['required']) && empty($input)) {
+            $this->addError($name, 'is required');
+            return false;
+        }
+
         switch ($type) {
             case 'text':
             case 'string':
