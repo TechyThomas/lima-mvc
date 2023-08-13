@@ -2,19 +2,38 @@
 
 namespace Lima\Database;
 
-class QueryComposer {
+class QueryComposer
+{
     private $sqlParts;
     private $values = [];
 
-    public function __construct($sqlParts) {
+    public function __construct($sqlParts)
+    {
         $this->sqlParts = $sqlParts;
     }
 
-    public function compose(): string {
+    public function compose(): string
+    {
         $sql = '';
 
         if (!empty($this->sqlParts['select'])) {
             $sql = "SELECT {$this->sqlParts['select']} FROM {$this->sqlParts['table']}";
+        }
+
+        if (!empty($this->sqlParts['insert'])) {
+            $insertColumns = [];
+            $insertValues = [];
+
+            foreach ($this->sqlParts['insert'] as $column => $value) {
+                $insertColumns[] = '`' . $column . '`';
+                $this->values[] = $value;
+                $insertValues[] = '?';
+            }
+
+            $columnString = join(', ', $insertColumns);
+            $valuesString = join(', ', $insertValues);
+
+            $sql = "INSERT INTO {$this->sqlParts['table']} ({$columnString}) VALUES ({$valuesString})";
         }
 
         if (!empty($this->sqlParts['update'])) {
@@ -52,12 +71,11 @@ class QueryComposer {
             $sql .= ' LIMIT ' . $this->sqlParts['limit'];
         }
 
-        // echo $sql. '<br/>';
-
         return $sql;
     }
 
-    public function composeWhere(): string {
+    public function composeWhere(): string
+    {
         if (empty($this->sqlParts['where'])) {
             return '';
         }
@@ -72,7 +90,8 @@ class QueryComposer {
         return join(' AND ', $sqlWhere);
     }
 
-    public function getValues(): array {
+    public function getValues(): array
+    {
         return $this->values;
     }
 }

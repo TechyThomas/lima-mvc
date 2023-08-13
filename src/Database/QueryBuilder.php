@@ -61,17 +61,19 @@ class QueryBuilder
         return $this->pdo->execute($this->values);
     }
 
-    public function insert($data): bool|int
+    public function insert($data): bool|int|string
     {
         $this->sqlParts['insert'] = $data;
-        $this->prepareQuery();
 
-        $doInsert = $this->pdo->execute($this->values);
+        $prepare = $this->prepareQuery();
+        $doInsert = $prepare->execute($this->values);
+
+        $this->sqlParts['insert'] = '';
 
         if (!$doInsert)
             return false;
 
-        return $this->pdo->lastInsertID();
+        return $this->database->getPDO()->lastInsertId();
     }
 
     public function delete(): bool

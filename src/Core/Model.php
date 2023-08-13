@@ -42,6 +42,7 @@ class Model extends QueryBuilder
         if (!empty($this->timestamps) && in_array('created', $this->timestamps)) {
             $dt = new \DateTime();
             $data['date_created'] = $dt->format('Y-m-d H:i:s');
+            $data['date_updated'] = $dt->format('Y-m-d H:i:s');
         }
 
         if (!empty($this->fields)) {
@@ -53,11 +54,12 @@ class Model extends QueryBuilder
             }
         }
 
-        $insertRow = $this->insert($data);
-        if (!$insertRow)
+        $insertRowID = $this->insert($data);
+
+        if (!$insertRowID)
             return false;
 
-        return $this->getByID($insertRow);
+        return $this->getByID($insertRowID);
     }
 
     public function update($data): bool
