@@ -75,10 +75,9 @@ class App
 
     public function loadRoutes()
     {
-        if (empty($_GET['url']))
-            return;
+        $url = $_GET['url'] ?? 'home';
 
         $router = new \Lima\Routing\Router();
-        $router->processRequest($_GET['url']);
+        $router->processRequest($url);
     }
 }
