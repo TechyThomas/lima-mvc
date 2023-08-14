@@ -26,7 +26,7 @@ class Router
 
             $contents = file_get_contents($controllerFile);
             preg_match('/[\r\n]namespace\W(.+);[\r\n]/', $contents, $matches);
-            $namespace = $matches[1];
+            $namespace = $matches[1] ?? null;
 
             if (!empty($namespace)) {
                 $controllerClassFull = $namespace . '\\' . $controller;
