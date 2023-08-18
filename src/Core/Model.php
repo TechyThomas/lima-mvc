@@ -94,7 +94,11 @@ class Model extends QueryBuilder
                         $columnsToDelete[$column] = [];
                     }
 
-                    $columnsToDelete[$column][] = $value;
+                    if (is_int($value)) {
+                        $columnsToDelete[$column][] = $value;
+                    } else {
+                        $columnsToDelete[$column][] = '"' . $value . '"';
+                    }
                 }
             }
 
