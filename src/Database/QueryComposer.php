@@ -83,8 +83,20 @@ class QueryComposer
         $sqlWhere = [];
 
         foreach ($this->sqlParts['where'] as $column => $value) {
-            $sqlWhere[] = $column . ' = ?';
-            $this->values[] = $value;
+            $whereValue = $value[0];
+            $whereOperator = $value[1];
+
+            switch ($whereOperator) {
+                case '=':
+                default:
+                    $sqlWhere[] = $column . ' ' . $whereOperator . ' ?';
+                    break;
+                case 'IN':
+                    $sqlWhere[] = $column . ' ' . $whereOperator . ' (?)';
+                    break;
+            }
+
+            $this->values[] = $whereValue;
         }
 
         return join(' AND ', $sqlWhere);

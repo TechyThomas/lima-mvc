@@ -84,9 +84,9 @@ class QueryBuilder
         return $this->pdo->execute($this->values);
     }
 
-    public function where($column, $value): self
+    public function where($column, $value, $operator = '='): self
     {
-        $this->sqlParts['where'] = [$column => $value];
+        $this->sqlParts['where'] = [$column => [$value, $operator]];
         return $this;
     }
 

@@ -10,6 +10,7 @@ class Model extends QueryBuilder
     protected $primaryKey = '';
     protected $fields = [];
     protected $timestamps = ['created', 'updated'];
+    protected $foreignKeys = [];
 
     public function __construct()
     {
@@ -79,5 +80,34 @@ class Model extends QueryBuilder
         }
 
         return parent::update($data);
+    }
+
+    public function delete(): bool
+    {
+        if (!empty($this->foreignKeys)) {
+            $currentData = $this->select(array_keys($this->foreignKeys))->getAll();
+            $columnsToDelete = [];
+
+            foreach ($currentData as $row) {
+                foreach ($row as $column => $value) {
+                    if (empty($columnsToDelete[$column])) {
+                        $columnsToDelete[$column] = [];
+                    }
+
+                    $columnsToDelete[$column][] = $value;
+                }
+            }
+
+            foreach ($this->foreignKeys as $column => $models) {
+                foreach ($models as $model) {
+                    $modelInstance = new $model[0]();
+                    $modelColumn = $model[1];
+
+                    $modelInstance->where($modelColumn, join(',', $columnsToDelete[$column]), 'IN')->delete();
+                }
+            }
+        }
+
+        return parent::delete();
     }
 }
