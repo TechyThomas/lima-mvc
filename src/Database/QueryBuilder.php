@@ -2,6 +2,8 @@
 
 namespace Lima\Database;
 
+use FTP\Connection;
+
 class QueryBuilder
 {
     private $database;
@@ -58,7 +60,11 @@ class QueryBuilder
         $this->sqlParts['update'] = $data;
         $this->prepareQuery();
 
-        return $this->pdo->execute($this->values);
+        $result = $this->pdo->execute($this->values);
+
+        $this->resetSql();
+
+        return $result;
     }
 
     public function insert($data): bool|int|string
@@ -68,10 +74,11 @@ class QueryBuilder
         $prepare = $this->prepareQuery();
         $doInsert = $prepare->execute($this->values);
 
-        $this->sqlParts['insert'] = '';
+        $this->resetSql();
 
         if (!$doInsert)
             return false;
+
 
         return $this->database->getPDO()->lastInsertId();
     }
@@ -81,7 +88,11 @@ class QueryBuilder
         $this->sqlParts['delete'] = true;
         $this->prepareQuery();
 
-        return $this->pdo->execute($this->values);
+        $result = $this->pdo->execute($this->values);
+
+        $this->resetSql();
+
+        return $result;
     }
 
     public function where($column, $value, $operator = '='): self
@@ -120,31 +131,58 @@ class QueryBuilder
         return $db;
     }
 
-    public function get(): array
+    public function get(): Collection|Item|null
     {
         $results = $this->getAll();
 
         if (!empty($results) && count($results) == 1) {
-            return $results[0];
+            return new Item($results[0], $this);
         }
 
         return $results;
     }
 
-    public function getSingle()
+    public function getSingle(): Item|null
     {
         $results = $this->getAll();
         if (empty($results))
-            return $results;
+            return null;
 
-        return $results[0];
+        return new Item($results[0], $this);
     }
 
-    public function getAll(): array
+    public function getAll(): Collection|null
     {
         $db = $this->prepareQuery();
         $db->execute($this->values);
 
-        return $db->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $db->fetchAll(\PDO::FETCH_ASSOC);
+
+        $this->resetSql();
+
+        if (empty($results)) {
+            return null;
+        }
+
+        $rows = [];
+
+        foreach ($results as $index => $result) {
+            $rows[$index] = new Item($result, $this);
+        }
+
+        return new Collection($rows, $this);
+    }
+
+    public function resetSql()
+    {
+        $this->sqlParts = [
+            'table' => $this->sqlParts['table'],
+            'select' => '*',
+            'update' => '',
+            'insert' => '',
+            'delete' => false,
+            'limit' => -1,
+            'order' => ''
+        ];
     }
 }

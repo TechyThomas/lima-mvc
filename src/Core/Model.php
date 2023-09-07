@@ -2,6 +2,7 @@
 
 namespace Lima\Core;
 
+use Lima\Database\Item;
 use Lima\Database\QueryBuilder;
 
 class Model extends QueryBuilder
@@ -11,6 +12,7 @@ class Model extends QueryBuilder
     protected $fields = [];
     protected $timestamps = ['created', 'updated'];
     protected $foreignKeys = [];
+    protected $casts = [];
 
     public function __construct()
     {
@@ -27,7 +29,7 @@ class Model extends QueryBuilder
         }
     }
 
-    public function getByID($id): ?array
+    public function getByID($id): ?Item
     {
         $query = $this->where($this->primaryKey, $id)->getAll();
 
@@ -35,15 +37,21 @@ class Model extends QueryBuilder
             return null;
         }
 
-        return $query[0];
+        return new Item($query[0], $this);
     }
 
-    public function create($data): bool|array
+    public function create($data): bool|Item
     {
-        if (!empty($this->timestamps) && in_array('created', $this->timestamps)) {
+        if (!empty($this->timestamps)) {
             $dt = new \DateTime();
-            $data['date_created'] = $dt->format('Y-m-d H:i:s');
-            $data['date_updated'] = $dt->format('Y-m-d H:i:s');
+
+            if (in_array('created', $this->timestamps)) {
+                $data['date_created'] = $dt->format('Y-m-d H:i:s');
+            }
+
+            if (in_array('updated', $this->timestamps)) {
+                $data['date_updated'] = $dt->format('Y-m-d H:i:s');
+            }
         }
 
         if (!empty($this->fields)) {
@@ -53,6 +61,13 @@ class Model extends QueryBuilder
 
                 unset($data[$field]);
             }
+        }
+
+        foreach ($this->casts as $field => $type) {
+            if (empty($data[$field]))
+                continue;
+
+            $data[$field] = $this->castField($data[$field], $type);
         }
 
         $insertRowID = $this->insert($data);
@@ -113,5 +128,30 @@ class Model extends QueryBuilder
         }
 
         return parent::delete();
+    }
+
+    protected function castField($value, $type)
+    {
+        $type = strtolower($type);
+        $class = get_class($value);
+
+        if ($parentClass = get_parent_class($value)) {
+            $class = $parentClass;
+        }
+
+        switch ($type) {
+            case 'datetime':
+                $dt = $class === \DateTime::class ? $value : new \DateTime($value);
+                $value = $dt->format('Y-m-d H:i:s');
+
+                break;
+        }
+
+        return $value;
+    }
+
+    public function getKey()
+    {
+        return $this->primaryKey;
     }
 }
