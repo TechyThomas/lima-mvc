@@ -35,6 +35,8 @@ class Router
                 $controllerClass = new $controller();
             }
 
+            $method = str_replace('-', '_', $method);
+
             if (!method_exists($controllerClass, $method)) {
                 die('Method: ' . $method . ' does not exist in controller ' . $controller);
             }
