@@ -94,6 +94,13 @@ class Model extends QueryBuilder
             }
         }
 
+        foreach ($this->casts as $field => $type) {
+            if (empty($data[$field]))
+                continue;
+
+            $data[$field] = $this->castField($data[$field], $type);
+        }
+
         return parent::update($data);
     }
 
