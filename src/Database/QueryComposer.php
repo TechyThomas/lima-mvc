@@ -83,17 +83,23 @@ class QueryComposer
         $sqlWhere = [];
 
         foreach ($this->sqlParts['where'] as $column => $value) {
-            $whereValue = $value[0];
-            $whereOperator = $value[1];
 
-            switch ($whereOperator) {
-                case '=':
-                default:
-                    $sqlWhere[] = $column . ' ' . $whereOperator . ' ?';
-                    break;
-                case 'IN':
-                    $sqlWhere[] = $column . ' ' . $whereOperator . ' (?)';
-                    break;
+            if (is_array($value)) {
+                $whereValue = $value[0];
+                $whereOperator = $value[1];
+
+                switch ($whereOperator) {
+                    case '=':
+                    default:
+                        $sqlWhere[] = $column . ' ' . $whereOperator . ' ?';
+                        break;
+                    case 'IN':
+                        $sqlWhere[] = $column . ' ' . $whereOperator . ' (?)';
+                        break;
+                }
+            } else {
+                $whereValue = $value;
+                $sqlWhere[] = $column . ' = ?';
             }
 
             $this->values[] = $whereValue;
