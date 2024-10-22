@@ -2,15 +2,43 @@
 
 namespace Lima\Routing;
 
-use Lima\Core\Config;
-
 class Router
 {
+    private static $instance = null;
+
+    private function __construct()
+    {
+
+    }
+
+    // Prevent our singleton from being cloned or restorable from strings
+    protected function __clone(): void
+    {
+    }
+    public function __wakeup(): never
+    {
+        throw new \Exception("Cannot unserialize a singleton.");
+    }
+
+    public static function Instance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Router();
+        }
+
+        return self::$instance;
+    }
+
     private $routes = [];
 
     public function registerRoutes($routes)
     {
         $this->routes = $routes;
+    }
+
+    public static function registerRoute($request, $url, $controller, $method)
+    {
+        self::$instance->routes[$request][$url] = ['controller' => $controller, 'method' => $method];
     }
 
     public function processRequest($url)

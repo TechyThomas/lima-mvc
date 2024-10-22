@@ -6,6 +6,8 @@ require(__DIR__ . '/../../vendor/autoload.php');
 
 class App
 {
+    private static $instance = null;
+
     private $rootPath;
     private $appPath = 'app';
     private $controllerPath = 'Controllers';
@@ -16,15 +18,33 @@ class App
         $this->rootPath = $rootPath;
     }
 
+    // Prevent our singleton from being cloned or restorable from strings
+    protected function __clone(): void
+    {
+    }
+    public function __wakeup(): never
+    {
+        throw new \Exception("Cannot unserialize a singleton.");
+    }
+
+    public static function Instance($rootPath)
+    {
+        if (self::$instance === null) {
+            self::$instance = new App($rootPath);
+        }
+
+        return self::$instance;
+    }
+
     public function init()
     {
-        $this->loadEnv();
+        $this->loadEnvironment();
         $this->loadDefines();
         $this->loadClasses();
         $this->loadRoutes();
     }
 
-    public function loadEnv()
+    public function loadEnvironment()
     {
         $dotenv = $dotenv = \Dotenv\Dotenv::createImmutable($this->rootPath);
         $dotenv->load();
@@ -77,7 +97,13 @@ class App
     {
         $url = $_GET['url'] ?? 'home';
 
-        $router = new \Lima\Routing\Router();
+        $router = \Lima\Routing\Router::Instance();
         $router->processRequest($url);
+    }
+
+    public static function Run($rootPath): void
+    {
+        $app = self::Instance($rootPath);
+        $app->init();
     }
 }
