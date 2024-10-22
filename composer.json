@@ -1,6 +1,7 @@
 {
     "name": "spacecow/lima-mvc",
     "description": "A simple, expandable MVC framework",
+    "homepage": "https://github.com/TechyThomas/lima-mvc",
     "type": "library",
     "autoload": {
         "psr-4": {
@@ -10,7 +11,7 @@
     "authors": [
         {
             "name": "Thomas Carter",
-            "email": "thomas@spacecow.xyz"
+            "email": "thomas@techythomas.com"
         }
     ],
     "require": {
