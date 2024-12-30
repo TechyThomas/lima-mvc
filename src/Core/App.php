@@ -2,8 +2,6 @@
 
 namespace Lima\Core;
 
-require(__DIR__ . '/../../vendor/autoload.php');
-
 class App
 {
     private static $instance = null;
