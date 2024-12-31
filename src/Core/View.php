@@ -4,7 +4,7 @@ namespace Lima\Core;
 
 class View
 {
-    public function render($template, $data): bool
+    public function render($template, $data = []): bool
     {
         $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . 'views';
 
