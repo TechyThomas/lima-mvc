@@ -6,7 +6,7 @@ class Controller
 {
     public function view($template, $data = []): bool
     {
-        $view = new View();
+        $view = System::GetView();
         return $view->render($template, $data);
     }
 }
