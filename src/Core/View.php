@@ -26,7 +26,10 @@ class View
             return false;
         }
 
+        $view = $this;
+
         ob_start();
+        extract(['view' => $view]);
         require($templateFile);
         $html = ob_get_contents();
         ob_end_clean();
