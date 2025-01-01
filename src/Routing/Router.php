@@ -44,7 +44,7 @@ class Router
     public function processRequest($url)
     {
         $urlData = explode('/', filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL));
-        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
         if (empty($this->routes[$requestMethod][$url])) {
             $controller = ucfirst($urlData[0]);
