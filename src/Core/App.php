@@ -51,10 +51,6 @@ class App
 
         $dotenv->ifPresent('DB_DEFAULT_LIMIT')->isInteger();
 
-        foreach ($_ENV as $name => $value) {
-            define($name, $value);
-        }
-
         if (!empty($_ENV['LIMA_CONTROLLER_PATH'])) {
             $this->controllerPath = $_ENV['LIMA_CONTROLLER_PATH'];
         }
@@ -69,7 +65,7 @@ class App
         define('LIMA_ROOT', $this->rootPath);
 
         $controllerPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->controllerPath;
-        $modelPath = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->modelPath;
+        $modelPath      = $this->rootPath . DIRECTORY_SEPARATOR . $this->appPath . DIRECTORY_SEPARATOR . $this->modelPath;
 
         define('CONTROLLER_PATH', $controllerPath);
         define('MODEL_PATH', $modelPath);
@@ -79,7 +75,7 @@ class App
     {
         spl_autoload_register(function ($class) {
             $controllerPath = CONTROLLER_PATH;
-            $modelPath = MODEL_PATH;
+            $modelPath      = MODEL_PATH;
 
             if (file_exists($controllerPath . DIRECTORY_SEPARATOR . $class . '.php')) {
                 require_once($controllerPath . DIRECTORY_SEPARATOR . $class . '.php');
