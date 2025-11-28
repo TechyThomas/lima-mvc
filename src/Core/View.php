@@ -38,4 +38,14 @@ class View
 
         return true;
     }
+
+    public function get_header(): bool
+    {
+        return $this->render('_templates/header');
+    }
+
+    public function get_footer(): bool
+    {
+        return $this->render('_templates/footer');
+    }
 }
