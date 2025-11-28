@@ -9,12 +9,12 @@ class View
         $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . 'views';
 
         if (!empty($_ENV['LIMA_TEMPLATE_DIR'])) {
-            $templateDir = $_ENV['LIMA_TEMPLATE_DIR'];
+            $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . $_ENV['LIMA_TEMPLATE_DIR'];
         }
 
         if (class_exists('\Twig\Loader\FilesystemLoader')) {
             $loader = new \Twig\Loader\FilesystemLoader($templateDir);
-            $twig = new \Twig\Environment($loader);
+            $twig   = new \Twig\Environment($loader);
 
             echo $twig->render($template . '.php', $data);
 
