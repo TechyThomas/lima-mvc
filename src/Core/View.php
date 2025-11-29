@@ -4,8 +4,12 @@ namespace Lima\Core;
 
 class View
 {
+    private array $currentData = [];
+
     public function render($template, $data = []): bool
     {
+        $this->currentData = $data;
+
         $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . 'views';
 
         if (!empty($_ENV['LIMA_TEMPLATE_DIR'])) {
@@ -41,11 +45,11 @@ class View
 
     public function get_header(): bool
     {
-        return $this->render('_templates/header');
+        return $this->render('_templates/header', $this->currentData);
     }
 
     public function get_footer(): bool
     {
-        return $this->render('_templates/footer');
+        return $this->render('_templates/footer', $this->currentData);
     }
 }
