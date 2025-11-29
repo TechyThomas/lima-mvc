@@ -21,14 +21,14 @@ class System
         return $overrides[$class];
     }
 
-    public static function GetView()
+    public static function GetView(array $data = [])
     {
         $viewClass = self::GetOverride('View');
 
         if (empty($viewClass)) {
-            return new View();
+            return new View($data);
         }
 
-        return new $viewClass();
+        return new $viewClass($data);
     }
 }
