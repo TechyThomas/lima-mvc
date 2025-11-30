@@ -22,12 +22,12 @@ class QueryComposer
 
         if (!empty($this->sqlParts['insert'])) {
             $insertColumns = [];
-            $insertValues = [];
+            $insertValues  = [];
 
             foreach ($this->sqlParts['insert'] as $column => $value) {
                 $insertColumns[] = '`' . $column . '`';
-                $this->values[] = $value;
-                $insertValues[] = '?';
+                $this->values[]  = $value;
+                $insertValues[]  = '?';
             }
 
             $columnString = join(', ', $insertColumns);
@@ -40,7 +40,7 @@ class QueryComposer
             $updateSet = [];
 
             foreach ($this->sqlParts['update'] as $column => $value) {
-                $updateSet[] = "`{$column}` = ?";
+                $updateSet[]    = "`{$column}` = ?";
                 $this->values[] = $value;
             }
 
@@ -56,11 +56,11 @@ class QueryComposer
         }
 
         if (!empty($this->sqlParts['order'])) {
-            $orderColumn = $this->sqlParts['order'];
+            $orderColumn    = $this->sqlParts['order'];
             $orderDirection = 'DESC';
 
             if (is_array($this->sqlParts['order'])) {
-                $orderColumn = $this->sqlParts['order'][0];
+                $orderColumn    = $this->sqlParts['order'][0];
                 $orderDirection = $this->sqlParts['order'][1];
             }
 
@@ -69,6 +69,10 @@ class QueryComposer
 
         if ($this->sqlParts['limit'] > 0) {
             $sql .= ' LIMIT ' . $this->sqlParts['limit'];
+        }
+
+        if ($this->sqlParts['offset'] > 0) {
+            $sql .= ' OFFSET ' . $this->sqlParts['offset'];
         }
 
         return $sql;
@@ -85,7 +89,7 @@ class QueryComposer
         foreach ($this->sqlParts['where'] as $column => $value) {
 
             if (is_array($value)) {
-                $whereValue = $value[0];
+                $whereValue    = $value[0];
                 $whereOperator = $value[1];
 
                 switch ($whereOperator) {
