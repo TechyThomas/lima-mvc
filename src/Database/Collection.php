@@ -29,4 +29,14 @@ class Collection
     {
         return end($this->items) ?? null;
     }
+
+    public function count(): int
+    {
+        return count($this->items);
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
+    }
 }

@@ -2,8 +2,6 @@
 
 namespace Lima\Database;
 
-use FTP\Connection;
-
 class QueryBuilder
 {
     private $database;
@@ -22,8 +20,6 @@ class QueryBuilder
     ];
 
     protected $fields = [];
-
-    private $lastInsertID;
 
     public function __construct()
     {
@@ -142,8 +138,8 @@ class QueryBuilder
     {
         $results = $this->getAll();
 
-        if (!empty($results) && count($results) == 1) {
-            return new Item($results[0], $this);
+        if (!empty($results) && $results->count() == 1) {
+            return new Item($results->first(), $this);
         }
 
         return $results;
@@ -155,7 +151,7 @@ class QueryBuilder
         if (empty($results))
             return null;
 
-        return new Item($results[0], $this);
+        return new Item($results->first(), $this);
     }
 
     public function getAll(): Collection|null

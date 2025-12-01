@@ -33,11 +33,11 @@ class Model extends QueryBuilder
     {
         $query = $this->where($this->primaryKey, $id)->getAll();
 
-        if (empty($query) || count($query) > 1) {
+        if (empty($query) || $query->count() > 1) {
             return null;
         }
 
-        return new Item($query[0], $this);
+        return new Item($query->first(), $this);
     }
 
     public function create($data): bool|Item
@@ -81,7 +81,7 @@ class Model extends QueryBuilder
     public function update($data): bool
     {
         if (!empty($this->timestamps) && in_array('updated', $this->timestamps)) {
-            $dt = new \DateTime();
+            $dt                   = new \DateTime();
             $data['date_updated'] = $dt->format('Y-m-d H:i:s');
         }
 
@@ -107,7 +107,7 @@ class Model extends QueryBuilder
     public function delete(): bool
     {
         if (!empty($this->foreignKeys)) {
-            $currentData = $this->select(array_keys($this->foreignKeys))->getAll();
+            $currentData     = $this->select(array_keys($this->foreignKeys))->getAll();
             $columnsToDelete = [];
 
             foreach ($currentData as $row) {
@@ -127,7 +127,7 @@ class Model extends QueryBuilder
             foreach ($this->foreignKeys as $column => $models) {
                 foreach ($models as $model) {
                     $modelInstance = new $model[0]();
-                    $modelColumn = $model[1];
+                    $modelColumn   = $model[1];
 
                     $modelInstance->where($modelColumn, join(',', $columnsToDelete[$column]), 'IN')->delete();
                 }
@@ -139,7 +139,7 @@ class Model extends QueryBuilder
 
     protected function castField($value, $type)
     {
-        $type = strtolower($type);
+        $type  = strtolower($type);
         $class = get_class($value);
 
         if ($parentClass = get_parent_class($value)) {
