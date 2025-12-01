@@ -2,9 +2,14 @@
 
 namespace Lima\Routing;
 
+use ReflectionClass;
+
 class Router
 {
     private static $instance = null;
+
+    private string $currentController = '';
+    private string $currentMethod = '';
 
     private function __construct()
     {
@@ -43,12 +48,12 @@ class Router
 
     public function processRequest($url)
     {
-        $urlData = explode('/', filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL));
+        $urlData       = explode('/', filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL));
         $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
         if (empty($this->routes[$requestMethod][$url])) {
             $controller = ucfirst($urlData[0]);
-            $method = $urlData[1] ?? 'index';
+            $method     = $urlData[1] ?? 'index';
 
             $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
 
@@ -58,7 +63,7 @@ class Router
 
             if (!empty($namespace)) {
                 $controllerClassFull = $namespace . '\\' . $controller;
-                $controllerClass = new $controllerClassFull();
+                $controllerClass     = new $controllerClassFull();
             } else {
                 $controllerClass = new $controller();
             }
@@ -74,7 +79,22 @@ class Router
 
             $params = array_values($urlData);
 
+            $reflection = new ReflectionClass($controllerClass);
+
+            $this->currentController = $reflection->getShortName();
+            $this->currentMethod     = $method;
+
             call_user_func_array([$controllerClass, $method], $params);
         }
+    }
+
+    public function getCurrentController(): string
+    {
+        return $this->currentController;
+    }
+
+    public function getCurrentMethod(): string
+    {
+        return $this->currentMethod;
     }
 }
