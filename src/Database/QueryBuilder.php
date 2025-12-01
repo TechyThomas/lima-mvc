@@ -17,6 +17,7 @@ class QueryBuilder
         'insert' => '',
         'delete' => false,
         'limit'  => -1,
+        'offset' => 0,
         'order'  => ''
     ];
 
