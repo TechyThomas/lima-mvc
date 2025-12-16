@@ -134,11 +134,11 @@ class QueryBuilder
         return $db;
     }
 
-    public function get(): Collection|Item|null
+    public function get(): Collection|Item
     {
         $results = $this->getAll();
 
-        if (!empty($results) && $results->count() == 1) {
+        if ($results->count() == 1) {
             return new Item($results->first(), $this);
         }
 
@@ -154,7 +154,7 @@ class QueryBuilder
         return new Item($results->first(), $this);
     }
 
-    public function getAll(): Collection|null
+    public function getAll(): Collection
     {
         $db = $this->prepareQuery();
         $db->execute($this->values);
@@ -163,14 +163,12 @@ class QueryBuilder
 
         $this->resetSql();
 
-        if (empty($results)) {
-            return null;
-        }
-
         $rows = [];
 
-        foreach ($results as $index => $result) {
-            $rows[$index] = new Item($result, $this);
+        if (!empty($results)) {
+            foreach ($results as $index => $result) {
+                $rows[$index] = new Item($result, $this);
+            }
         }
 
         return new Collection($rows, $this);
