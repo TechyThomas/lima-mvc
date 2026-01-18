@@ -9,7 +9,7 @@ class Item extends ArrayObject
 {
     private $model;
 
-    public function __construct($array, Model $model)
+    public function __construct($array, Model|QueryBuilder $model)
     {
         parent::__construct($array);
 

@@ -52,6 +52,10 @@ class Router
 
             $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
 
+            if (!file_exists($controllerFile)) {
+                throw new \Exception('Controller: ' . $controller . ' does not exist');
+            }
+
             $contents = file_get_contents($controllerFile);
             preg_match('/[\r\n]namespace\W(.+);[\r\n]/', $contents, $matches);
             $namespace = $matches[1] ?? null;
@@ -66,7 +70,7 @@ class Router
             $method = str_replace('-', '_', $method);
 
             if (!method_exists($controllerClass, $method)) {
-                die('Method: ' . $method . ' does not exist in controller ' . $controller);
+                throw new \Exception('Method: ' . $method . ' does not exist in controller ' . $controller);
             }
 
             unset($urlData[0]);
@@ -75,6 +79,13 @@ class Router
             $params = array_values($urlData);
 
             call_user_func_array([$controllerClass, $method], $params);
+        } else {
+            $route = $this->routes[$requestMethod][$url];
+            $controller = $route['controller'];
+            $method = $route['method'];
+
+            $controllerClass = new $controller();
+            call_user_func_array([$controllerClass, $method], []);
         }
     }
 }
