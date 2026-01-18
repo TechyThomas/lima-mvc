@@ -9,7 +9,11 @@ class Database
 
     private function __construct($host, $name, $user, $pass)
     {
-        $this->database = new \PDO("mysql:host=" . $host . ";dbname=" . $name, $user, $pass);
+        if (strpos($host, 'sqlite:') === 0) {
+            $this->database = new \PDO($host);
+        } else {
+            $this->database = new \PDO("mysql:host=" . $host . ";dbname=" . $name, $user, $pass);
+        }
         $this->database->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
     }
 
