@@ -136,6 +136,10 @@ class Router
         unset($urlData[0]);
         unset($urlData[1]);
 
+        if ($namespace) {
+            unset($urlData[2]);
+        }
+
         $params = array_values($urlData);
 
         $reflection = new ReflectionClass($controllerClass);
