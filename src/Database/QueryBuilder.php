@@ -148,7 +148,8 @@ class QueryBuilder
     public function getSingle(): Item|null
     {
         $results = $this->getAll();
-        if (empty($results))
+
+        if ($results->isEmpty())
             return null;
 
         return new Item($results->first(), $this);
