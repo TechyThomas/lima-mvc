@@ -22,7 +22,7 @@ class Database
         throw new \Exception("Cannot unserialize a singleton.");
     }
 
-    public static function getInstance($host, $name, $user, $pass)
+    public static function getInstance($host = '', $name = '', $user = '', $pass = '')
     {
         if (empty(self::$instance)) {
             self::$instance = new Database($host, $name, $user, $pass);
