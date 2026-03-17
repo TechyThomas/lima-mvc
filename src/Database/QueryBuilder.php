@@ -2,8 +2,6 @@
 
 namespace Lima\Database;
 
-use FTP\Connection;
-
 class QueryBuilder
 {
     private $database;
@@ -11,18 +9,17 @@ class QueryBuilder
     private $values;
 
     private $sqlParts = [
-        'table' => '',
+        'table'  => '',
         'select' => '*',
         'update' => '',
         'insert' => '',
         'delete' => false,
-        'limit' => -1,
-        'order' => ''
+        'limit'  => -1,
+        'offset' => 0,
+        'order'  => ''
     ];
 
     protected $fields = [];
-
-    private $lastInsertID;
 
     public function __construct()
     {
@@ -46,7 +43,7 @@ class QueryBuilder
     public function select($columns = []): self
     {
         if (!empty($columns)) {
-            $columns = is_array($columns) ? $columns : [$columns];
+            $columns                  = is_array($columns) ? $columns : [$columns];
             $this->sqlParts['select'] = join(', ', $columns);
         } else {
             $this->sqlParts['select'] = '*';
@@ -71,7 +68,7 @@ class QueryBuilder
     {
         $this->sqlParts['insert'] = $data;
 
-        $prepare = $this->prepareQuery();
+        $prepare  = $this->prepareQuery();
         $doInsert = $prepare->execute($this->values);
 
         $this->resetSql();
@@ -113,6 +110,12 @@ class QueryBuilder
         return $this;
     }
 
+    public function offset($offset): self
+    {
+        $this->sqlParts['offset'] = (int) $offset;
+        return $this;
+    }
+
     public function order($order, $direction = 'DESC'): self
     {
         $this->sqlParts['order'] = [$order, $direction];
@@ -122,21 +125,21 @@ class QueryBuilder
     private function prepareQuery(): \PDOStatement
     {
         $queryComposer = new QueryComposer($this->sqlParts);
-        $sql = $queryComposer->compose();
+        $sql           = $queryComposer->compose();
 
-        $db = $this->database->getPDO()->prepare($sql);
+        $db           = $this->database->getPDO()->prepare($sql);
         $this->values = $queryComposer->getValues();
-        $this->pdo = $db;
+        $this->pdo    = $db;
 
         return $db;
     }
 
-    public function get(): Collection|Item|null
+    public function get(): Collection|Item
     {
         $results = $this->getAll();
 
-        if (!empty($results) && count($results) == 1) {
-            return new Item($results[0], $this);
+        if ($results->count() == 1) {
+            return new Item($results->first(), $this);
         }
 
         return $results;
@@ -145,13 +148,14 @@ class QueryBuilder
     public function getSingle(): Item|null
     {
         $results = $this->getAll();
-        if (empty($results))
+
+        if ($results->isEmpty())
             return null;
 
-        return new Item($results[0], $this);
+        return new Item($results->first(), $this);
     }
 
-    public function getAll(): Collection|null
+    public function getAll(): Collection
     {
         $db = $this->prepareQuery();
         $db->execute($this->values);
@@ -160,29 +164,42 @@ class QueryBuilder
 
         $this->resetSql();
 
-        if (empty($results)) {
-            return null;
-        }
-
         $rows = [];
 
-        foreach ($results as $index => $result) {
-            $rows[$index] = new Item($result, $this);
+        if (!empty($results)) {
+            foreach ($results as $index => $result) {
+                $rows[$index] = new Item($result, $this);
+            }
         }
 
         return new Collection($rows, $this);
     }
 
+    public function getCount(): int
+    {
+        $this->select('COUNT(*) as total_items');
+
+        $db = $this->prepareQuery();
+        $db->execute($this->values);
+
+        $results = $db->fetch(\PDO::FETCH_ASSOC);
+
+        $this->resetSql();
+
+        return (int) $results['total_items'] ?? 0;
+    }
+
     public function resetSql()
     {
         $this->sqlParts = [
-            'table' => $this->sqlParts['table'],
+            'table'  => $this->sqlParts['table'],
             'select' => '*',
             'update' => '',
             'insert' => '',
             'delete' => false,
-            'limit' => -1,
-            'order' => ''
+            'limit'  => -1,
+            'offset' => 0,
+            'order'  => ''
         ];
     }
 }

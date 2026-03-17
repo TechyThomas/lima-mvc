@@ -2,19 +2,41 @@
 
 namespace Lima\Database;
 
-use ArrayObject;
 use Lima\Core\Model;
 
-class Collection extends ArrayObject
+class Collection
 {
+    private array $items = [];
+
     public function __construct($array, Model $model)
     {
-        $itemArray = [];
-
         foreach ($array as $key => $value) {
-            $itemArray[$key] = new Item($value, $model);
+            $this->items[$key] = new Item($value, $model);
         }
+    }
 
-        parent::__construct($itemArray);
+    public function items(): array
+    {
+        return $this->items;
+    }
+
+    public function first(): ?Item
+    {
+        return array_values($this->items)[0] ?? null;
+    }
+
+    public function last(): ?Item
+    {
+        return end($this->items) ?? null;
+    }
+
+    public function count(): int
+    {
+        return count($this->items);
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
     }
 }

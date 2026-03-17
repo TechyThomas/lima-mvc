@@ -4,17 +4,26 @@ namespace Lima\Core;
 
 class View
 {
-    public function render($template, $data): bool
+    private array $data = [];
+
+    public function __construct($data = [])
     {
+        $this->data = $data;
+    }
+
+    public function render($template, $data = []): bool
+    {
+        $data = array_merge($this->data, $data);
+
         $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . 'views';
 
         if (!empty($_ENV['LIMA_TEMPLATE_DIR'])) {
-            $templateDir = $_ENV['LIMA_TEMPLATE_DIR'];
+            $templateDir = LIMA_ROOT . DIRECTORY_SEPARATOR . $_ENV['LIMA_TEMPLATE_DIR'];
         }
 
         if (class_exists('\Twig\Loader\FilesystemLoader')) {
             $loader = new \Twig\Loader\FilesystemLoader($templateDir);
-            $twig = new \Twig\Environment($loader);
+            $twig   = new \Twig\Environment($loader);
 
             echo $twig->render($template . '.php', $data);
 
@@ -37,5 +46,15 @@ class View
         echo $html;
 
         return true;
+    }
+
+    public function get_header(): bool
+    {
+        return $this->render('_templates/header');
+    }
+
+    public function get_footer(): bool
+    {
+        return $this->render('_templates/footer');
     }
 }
