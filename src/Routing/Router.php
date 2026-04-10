@@ -108,10 +108,17 @@ class Router
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
-                    var_dump($controller);
-                    var_dump($routeData['namespace'] . '\\' .$controller);
-                    var_dump(class_exists($routeData['namespace'] . '\\' .$controller));
-                    echo '<br/></br/>';
+                    // var_dump($controller);
+                    // var_dump($routeData['namespace'] . '\\' .$controller);
+                    // var_dump(class_exists($routeData['namespace'] . '\\' .$controller));
+                    // echo '<br/></br/>';
+
+                    $fullClassName = $routeData['namespace'] . '\\' .$controller;
+
+                    if (class_exists($fullClassName)) {
+                        $controllerClass = new $fullClassName();
+                        // break;
+                    }
 
                     // foreach (array_reverse($classes) as $class) {
                     //     $reflection = new ReflectionClass($class);
