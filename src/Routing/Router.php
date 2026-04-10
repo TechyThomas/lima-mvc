@@ -89,36 +89,28 @@ class Router
             $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
         }
 
-        if (!file_exists($controllerFile)) {
-            die('Contoller: ' . $controller . ' does not exist');
+        if (file_exists($controllerFile)) {
+            require_once($controllerFile);
         }
-
-        require_once($controllerFile);
-
-        $classes = get_declared_classes();
 
         if (!empty($this->routes[$urlFirstPart])) {
             $routeData = $this->routes[$urlFirstPart];
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
-                    foreach (array_reverse($classes) as $class) {
-                        $reflection = new ReflectionClass($class);
+                    $fullClassName = $routeData['namespace'] . '\\' .$controller;
 
-                        if ($reflection->getNamespaceName() === $routeData['namespace'] && $reflection->getShortName() === $controller) {
-                            $controllerClass = new $class();
-                            break;
-                        }
+                    if (class_exists($fullClassName)) {
+                        $controllerClass = new $fullClassName();
                     }
                 }
             }
         } else if (empty($this->routes[$url])) {
-            foreach (array_reverse($classes) as $class) {
-                $reflection = new ReflectionClass($class);
+            if (!empty($this->routes['*']) && !empty($this->routes['*']['namespace'])) {
+                $fullClassName = $this->routes['*']['namespace'] . '\\' .$controller;
 
-                if ($reflection->getShortName() === $controller) {
-                    $controllerClass = new $class();
-                    break;
+                if (class_exists($fullClassName)) {
+                    $controllerClass = new $fullClassName();
                 }
             }
         }
