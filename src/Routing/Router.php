@@ -99,23 +99,28 @@ class Router
 
         $classes = get_declared_classes();
 
-        echo '<pre>';
-        var_dump($classes);
-        echo '</pre>';
+        // echo '<pre>';
+        // var_dump($classes);
+        // echo '</pre>';
 
         if (!empty($this->routes[$urlFirstPart])) {
             $routeData = $this->routes[$urlFirstPart];
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
-                    foreach (array_reverse($classes) as $class) {
-                        $reflection = new ReflectionClass($class);
+                    var_dump($controller);
+                    var_dump($routeData['namespace'] . '\\' .$controller);
+                    var_dump(class_exists($routeData['namespace'] . '\\' .$controller));
+                    echo '<br/></br/>';
 
-                        if ($reflection->getNamespaceName() === $routeData['namespace'] && $reflection->getShortName() === $controller) {
-                            $controllerClass = new $class();
-                            break;
-                        }
-                    }
+                    // foreach (array_reverse($classes) as $class) {
+                    //     $reflection = new ReflectionClass($class);
+
+                    //     if ($reflection->getNamespaceName() === $routeData['namespace'] && $reflection->getShortName() === $controller) {
+                    //         $controllerClass = new $class();
+                    //         break;
+                    //     }
+                    // }
                 }
             }
         } else if (empty($this->routes[$url])) {
