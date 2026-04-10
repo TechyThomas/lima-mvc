@@ -39,6 +39,10 @@ class App
         $this->loadEnvironment();
         $this->loadDefines();
         $this->loadClasses();
+    }
+
+    public function process()
+    {
         $this->loadRoutes();
     }
 
@@ -99,5 +103,6 @@ class App
     {
         $app = self::Instance($rootPath);
         $app->init();
+        $app->process();
     }
 }

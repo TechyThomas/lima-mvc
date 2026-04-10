@@ -77,14 +77,14 @@ class Router
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
                     $namespace  = $this->convertUrlCase($urlData[0]);
-                    $controller = ucfirst($urlData[1]);
+                    $controller = $this->convertUrlCase($urlData[1]);
                     $method     = $urlData[2] ?? 'index';
 
                     $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $namespace . DIRECTORY_SEPARATOR . $controller . '.php';
                 }
             }
         } else if (empty($this->routes[$url])) {
-            $controller     = ucfirst($urlData[0]);
+            $controller     = $this->convertUrlCase($urlData[0]);
             $method         = $urlData[1] ?? 'index';
             $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
         }
