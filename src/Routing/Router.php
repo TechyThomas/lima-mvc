@@ -89,54 +89,28 @@ class Router
             $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
         }
 
-        if (!file_exists($controllerFile)) {
-            // die('Contoller: ' . $controller . ' does not exist');
-        }
-        else {
+        if (file_exists($controllerFile)) {
             require_once($controllerFile);
         }
-
-
-        $classes = get_declared_classes();
-
-        // echo '<pre>';
-        // var_dump($classes);
-        // echo '</pre>';
 
         if (!empty($this->routes[$urlFirstPart])) {
             $routeData = $this->routes[$urlFirstPart];
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
-                    // var_dump($controller);
-                    // var_dump($routeData['namespace'] . '\\' .$controller);
-                    // var_dump(class_exists($routeData['namespace'] . '\\' .$controller));
-                    // echo '<br/></br/>';
-
                     $fullClassName = $routeData['namespace'] . '\\' .$controller;
 
                     if (class_exists($fullClassName)) {
                         $controllerClass = new $fullClassName();
-                        // break;
                     }
-
-                    // foreach (array_reverse($classes) as $class) {
-                    //     $reflection = new ReflectionClass($class);
-
-                    //     if ($reflection->getNamespaceName() === $routeData['namespace'] && $reflection->getShortName() === $controller) {
-                    //         $controllerClass = new $class();
-                    //         break;
-                    //     }
-                    // }
                 }
             }
         } else if (empty($this->routes[$url])) {
-            foreach (array_reverse($classes) as $class) {
-                $reflection = new ReflectionClass($class);
+            if (!empty($this->routes['*']) && !empty($this->routes['*']['namespace'])) {
+                $fullClassName = $this->routes['*']['namespace'] . '\\' .$controller;
 
-                if ($reflection->getShortName() === $controller) {
-                    $controllerClass = new $class();
-                    break;
+                if (class_exists($fullClassName)) {
+                    $controllerClass = new $fullClassName();
                 }
             }
         }
