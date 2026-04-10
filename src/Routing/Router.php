@@ -90,7 +90,7 @@ class Router
         }
 
         if (!file_exists($controllerFile)) {
-            die('Contoller: ' . $controller . ' does not exist');
+            // die('Contoller: ' . $controller . ' does not exist');
         }
 
         require_once($controllerFile);
