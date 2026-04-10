@@ -99,7 +99,9 @@ class Router
 
         $classes = get_declared_classes();
 
+        echo '<pre>';
         var_dump($classes);
+        echo '</pre>';
 
         if (!empty($this->routes[$urlFirstPart])) {
             $routeData = $this->routes[$urlFirstPart];
