@@ -98,6 +98,10 @@ class Router
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
+                    if (!empty($this->routes['*']['controller'])) {
+                        $controller = $this->routes['*']['controller'];
+                    }
+
                     $fullClassName = $routeData['namespace'] . '\\' .$controller;
 
                     if (class_exists($fullClassName)) {
@@ -107,6 +111,10 @@ class Router
             }
         } else if (empty($this->routes[$url])) {
             if (!empty($this->routes['*']) && !empty($this->routes['*']['namespace'])) {
+                if (!empty($this->routes['*']['controller'])) {
+                    $controller = $this->routes['*']['controller'];
+                }
+
                 $fullClassName = $this->routes['*']['namespace'] . '\\' .$controller;
 
                 if (class_exists($fullClassName)) {
