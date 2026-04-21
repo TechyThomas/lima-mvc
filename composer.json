@@ -1,6 +1,7 @@
 {
     "name": "spacecow/lima-mvc",
     "description": "A simple, expandable MVC framework",
+    "version": "1.0.0",
     "keywords": ["mvc", "framework"],
     "homepage": "https://github.com/TechyThomas/lima-mvc",
     "license": "MIT",
