@@ -98,8 +98,8 @@ class Router
 
             if (is_array($routeData)) {
                 if (!empty($routeData['namespace'])) {
-                    if (!empty($this->routes['*']['controller'])) {
-                        $controller = $this->routes['*']['controller'];
+                    if (!empty($routeData['controller'])) {
+                        $controller = $routeData['controller'];
                     }
 
                     $fullClassName = $routeData['namespace'] . '\\' .$controller;
