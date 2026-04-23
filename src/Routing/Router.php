@@ -113,6 +113,10 @@ class Router
                     if (class_exists($fullClassName)) {
                         $controllerClass = new $fullClassName();
                     }
+
+                    if (!empty($routeData['method'])) {
+                        $method = $routeData['method'];
+                    }
                 }
             }
         } else if (empty($this->routes[$url])) {
@@ -131,6 +135,10 @@ class Router
 
                 if (class_exists($fullClassName)) {
                     $controllerClass = new $fullClassName();
+                }
+
+                if (!empty($this->routes['*']['method'])) {
+                    $method = $this->routes['*']['method'];
                 }
             }
         }
