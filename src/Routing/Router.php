@@ -102,6 +102,12 @@ class Router
                         $controller = $routeData['controller'];
                     }
 
+                    $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
+
+                    if (file_exists($controllerFile)) {
+                        require_once($controllerFile);
+                    }
+
                     $fullClassName = $routeData['namespace'] . '\\' .$controller;
 
                     if (class_exists($fullClassName)) {
@@ -113,6 +119,12 @@ class Router
             if (!empty($this->routes['*']) && !empty($this->routes['*']['namespace'])) {
                 if (!empty($this->routes['*']['controller'])) {
                     $controller = $this->routes['*']['controller'];
+                }
+
+                $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
+
+                if (file_exists($controllerFile)) {
+                    require_once($controllerFile);
                 }
 
                 $fullClassName = $this->routes['*']['namespace'] . '\\' .$controller;
