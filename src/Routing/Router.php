@@ -108,7 +108,7 @@ class Router
                         require_once($controllerFile);
                     }
 
-                    $fullClassName = $routeData['namespace'] . '\\' .$controller;
+                    $fullClassName = $routeData['namespace'] . '\\' . $controller;
 
                     if (class_exists($fullClassName)) {
                         $controllerClass = new $fullClassName();
@@ -131,7 +131,7 @@ class Router
                     require_once($controllerFile);
                 }
 
-                $fullClassName = $this->routes['*']['namespace'] . '\\' .$controller;
+                $fullClassName = $this->routes['*']['namespace'] . '\\' . $controller;
 
                 if (class_exists($fullClassName)) {
                     $controllerClass = new $fullClassName();
@@ -144,7 +144,8 @@ class Router
         }
 
         if (!$controllerClass) {
-            die("Controller class not found: {$controller}");
+            $this->renderNotFound();
+            return;
         }
 
         $method = str_replace('-', '_', $method);
@@ -168,6 +169,43 @@ class Router
         $this->currentMethod     = $method;
 
         call_user_func_array([$controllerClass, $method], $params);
+    }
+
+    private function renderNotFound(): void
+    {
+        http_response_code(404);
+
+        if (!empty($this->routes['404']) && is_array($this->routes['404'])) {
+            $routeData  = $this->routes['404'];
+            $controller = $routeData['controller'] ?? null;
+            $method     = $routeData['method'] ?? 'index';
+            $namespace  = $routeData['namespace'] ?? null;
+
+            if ($controller && $namespace) {
+                $controllerFile = CONTROLLER_PATH . DIRECTORY_SEPARATOR . $controller . '.php';
+
+                if (file_exists($controllerFile)) {
+                    require_once($controllerFile);
+                }
+
+                $fullClassName = $namespace . '\\' . $controller;
+
+                if (class_exists($fullClassName)) {
+                    $controllerInstance = new $fullClassName();
+                    $method             = str_replace('-', '_', $method);
+
+                    if (method_exists($controllerInstance, $method)) {
+                        $reflection              = new ReflectionClass($controllerInstance);
+                        $this->currentController = $reflection->getShortName();
+                        $this->currentMethod     = $method;
+                        call_user_func([$controllerInstance, $method]);
+                        return;
+                    }
+                }
+            }
+        }
+
+        die('404 Not Found');
     }
 
     public function getCurrentController(): string
