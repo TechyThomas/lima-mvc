@@ -51,6 +51,16 @@ class App
         $dotenv = $dotenv = \Dotenv\Dotenv::createImmutable($this->rootPath);
         $dotenv->load();
 
+        $dotenv->ifPresent('APP_ENV')->allowedValues(['local', 'development', 'production']);
+
+        $appEnv = strtolower($_ENV['APP_ENV'] ?? 'production');
+
+        if ($appEnv === 'production') {
+            @ini_set('display_errors', 0);
+        } else {
+            @ini_set('display_errors', 1);
+        }
+
         $dbEngine = strtolower($_ENV['DB_ENGINE'] ?? 'mysql');
 
         if ($dbEngine !== 'off') {
@@ -110,5 +120,10 @@ class App
         $app = self::Instance($rootPath);
         $app->init();
         $app->process();
+    }
+
+    public static function Environment()
+    {
+        return strtolower($_ENV['APP_ENV'] ?? 'production');
     }
 }
