@@ -51,9 +51,15 @@ class App
         $dotenv = $dotenv = \Dotenv\Dotenv::createImmutable($this->rootPath);
         $dotenv->load();
 
-        $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS']);
+        $dbEngine = strtolower($_ENV['DB_ENGINE'] ?? 'mysql');
 
-        $dotenv->ifPresent('DB_DEFAULT_LIMIT')->isInteger();
+        if ($dbEngine !== 'off') {
+            if ($dbEngine === 'mysql') {
+                $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS']);
+            }
+
+            $dotenv->ifPresent('DB_DEFAULT_LIMIT')->isInteger();
+        }
 
         if (!empty($_ENV['LIMA_CONTROLLER_PATH'])) {
             $this->controllerPath = $_ENV['LIMA_CONTROLLER_PATH'];
